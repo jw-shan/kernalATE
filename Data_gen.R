@@ -67,7 +67,7 @@ DataGen = function(n,SEED){
   #                             (2 * z - 1)/ (f.z.x.true * delta.d.true) + 
   #                             delta.true  )
   
-  return(list(x=x,z=z,d=d,y=y,delta.true=delta.true))
+  return(list(x=x[,2],z=z,d=d,y=y,delta.true=delta.true))
   
 }
 
