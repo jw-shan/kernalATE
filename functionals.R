@@ -50,16 +50,20 @@ T0 <- function(X,Y,D,Z,h){
   }
 
 T1 <- function(X,Y,D,Z,h){
+  n = length(Z)
   sum( (2*Z-1)/fhat(X,Z,h)*
              Y/deltaDhat(X,Z,D,h) ) /n
   }
 
 
 T2 <- function(X,Y,D,Z,h){
+  n = length(Z)
   sum( (2*Z-1)/fhat(X,Z,h)*
              D*deltaYhat(X,Z,Y,h) / (deltaDhat(X,Z,D,h))^2 ) /n
   }
 
-T3 <- function(X,Y,D,Z,h){sum( deltaYhat(X,Z,Y,h)/deltaDhat(X,Z,D,h) ) /n}
+T3 <- function(X,Y,D,Z,h){
+  n = length(Z)
+  sum( deltaYhat(X,Z,Y,h)/deltaDhat(X,Z,D,h) ) /n}
 
 Tt <- function(X,Y,D,Z,h){T0(X,Y,D,Z,h) + T1(X,Y,D,Z,h) - T2(X,Y,D,Z,h) + T3(X,Y,D,Z,h)}

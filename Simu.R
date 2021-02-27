@@ -36,4 +36,7 @@ repeat {
   T1est[count] <- T1(X,Y,D,Z,h)
   T2est[count] <- T2(X,Y,D,Z,h)
   T3est[count] <- T3(X,Y,D,Z,h)
+  print(T1est[count])
+  print(T2est[count])
+  print(T3est[count])
 }
