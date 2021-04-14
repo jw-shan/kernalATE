@@ -71,6 +71,23 @@ DataGen = function(n,SEED){
   
 }
 
+
+
+DataSplit = function(data,K,SEED){
+  set.seed(SEED)
+  
+  N = dim(data)[1]
+  rank <- split(sample(1:N,N),1:K)
+  
+  res = list()
+  for (k in 1:K) {
+    res[[k]] <- data[rank[[k]],]
+  }
+  return(res)
+}
+
+
+
 #N=20000
 #delta<- c(0)
 #for(i in 1:500){

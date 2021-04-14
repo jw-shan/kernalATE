@@ -45,8 +45,7 @@ deltaYhat <- function(X,Z,Y,h){
 T0 <- function(X,Y,D,Z,h){
   n = length(Z)
   sum( (2*Z-1)/fhat(X,Z,h)*
-             (pDhat(0,X,Z,D,h)*
-                deltaYhat(X,Z,Y,h) / (deltaDhat(X,Z,D,h))^2 -
+             (pDhat(0,X,Z,D,h)* deltaYhat(X,Z,Y,h) / (deltaDhat(X,Z,D,h))^2 -
                 pYhat(0,X,Z,Y,h) / deltaDhat(X,Z,D,h)) )/n
   }
 
@@ -68,3 +67,13 @@ T3 <- function(X,Y,D,Z,h){
   sum( deltaYhat(X,Z,Y,h)/deltaDhat(X,Z,D,h) ) /n}
 
 Tt <- function(X,Y,D,Z,h){T0(X,Y,D,Z,h) + T1(X,Y,D,Z,h) - T2(X,Y,D,Z,h) + T3(X,Y,D,Z,h)}
+
+estVeff <- function(X,Y,D,Z,h){
+  n = length(Z)
+  phi_i =  (2*Z-1)/fhat(X,Z,h)*
+         (Y/deltaDhat(X,Z,D,h) - D*deltaYhat(X,Z,Y,h) / (deltaDhat(X,Z,D,h))^2 +
+            pDhat(0,X,Z,D,h)* deltaYhat(X,Z,Y,h) / (deltaDhat(X,Z,D,h))^2 -
+            pYhat(0,X,Z,Y,h) / deltaDhat(X,Z,D,h)) +
+         deltaYhat(X,Z,Y,h)/deltaDhat(X,Z,D,h) 
+  sqrt(sum( (phi_i -  sum(phi_i)/n)^2  )/n )
+}
