@@ -43,6 +43,7 @@ deltaYhat <- function(X,Z,Y,h){
 
 # Estimators
 T0 <- function(X,Y,D,Z,h){
+  n = length(Z)
   sum( (2*Z-1)/fhat(X,Z,h)*
              (pDhat(0,X,Z,D,h)*
                 deltaYhat(X,Z,Y,h) / (deltaDhat(X,Z,D,h))^2 -
