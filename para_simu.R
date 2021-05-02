@@ -14,7 +14,7 @@ N <- 500
 truevalue<- 0.087
 
 ## Monto Carlo times and Sample Size###
-seed = 100
+seed = 300
 J <- 500
 N <- 1000
 truevalue<- 0.087
@@ -51,9 +51,10 @@ estimation <- function(count) {
   T2est <- T2(X,Y,D,Z,h)
   T3est <- T3(X,Y,D,Z,h)
   Test  <- Tt(X,Y,D,Z,hopt)
-  veff  <- estVeff(X,Y,D,Z,hopt)
+  # veff  <- estVeff(X,Y,D,Z,hopt)
   
-  est <- cbind(T1est,T2est,T3est,Test,veff)
+  # est <- cbind(T1est,T2est,T3est,Test,veff)
+  est <- cbind(T1est,T2est,T3est,Test)
   
   # est <- cbind(Test,veff)
   
@@ -62,8 +63,8 @@ estimation <- function(count) {
 
 est  <- parSapply(cl,1:J,estimation)
 est  <- t(est)
-veff <- est[,5]
-est  <- est[,1:4]
+# veff <- est[,5]
+# est  <- est[,1:4]
 
 
 result <- matrix(nrow = 4, ncol = 5)
