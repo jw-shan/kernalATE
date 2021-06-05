@@ -1,5 +1,5 @@
-source("MyFunc.R")
-
+source("1.1.1 MyFunc.R")
+source("1.1.2 TrueValue.R")
 
 
 
@@ -73,26 +73,12 @@ DataGen = function(n,SEED){
 
 
 
-DataSplit = function(data,K,SEED){
-  set.seed(SEED)
-  
-  N = dim(data)[1]
-  rank <- split(sample(1:N,N),1:K)
-  
-  res = list()
-  for (k in 1:K) {
-    res[[k]] <- data[rank[[k]],]
-  }
-  return(res)
-}
-
-
-
-#N=20000
-#delta<- c(0)
-#for(i in 1:500){
-#  Data<-DataGen(N,100+j)
+# ## true ATE
+# N=20000
+# delta<- c(0)
+# for(i in 1:500){
+#  Data<-DataGen(N,100+i)
 #  delta[i]<- mean(Data$delta.true)
-#}
-#mean(delta)
+# }
+# mean(delta)
 
