@@ -42,7 +42,7 @@ estimation <- function(count) {
   Data<-DataGen(N,seed+count)
   h <-  N^{-1/6}
   # hopt <- 1.06*sd(Data$x)* N^{-1/6}
-  hopt <-  N^{-1/6}
+  hopt <-  N^{-1/6} 
   X<-Data$x
   Z<-Data$z
   D<-Data$d
