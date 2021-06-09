@@ -2,7 +2,7 @@ rm(list=ls())
 library(parallel)
 
 source("1.1 Datagen_1D.R")
-source("1.2 KernelEstimators.R")
+source("1.2.1 KernelEstimators.R")
 source("1.3 plot.R")
 
 
@@ -39,8 +39,8 @@ clusterExport(cl,ls())
 estimation <- function(count) {
   
   Data<-DataGen(N,seed+count)
-  h <- 1.06*sqrt(var(Data$x))* N^{-2/7}
-  hopt <- 1.06*sqrt(var(Data$x))* N^{-1/5}
+  h <- 1.06*sd(Data$x)* N^{-2/7}
+  hopt <- 1.06*sd(Data$x)* N^{-1/5}
   X<-Data$x
   Z<-Data$z
   D<-Data$d

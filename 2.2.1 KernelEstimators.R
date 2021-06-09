@@ -1,12 +1,15 @@
 # kernel estimation
 ### not leave one out
+### 4-order kernel
+
+ker_4 <- function(u){(1.5-0.5*u^2)*dnorm(u)} 
 
 fhat <- function(X,Z,h){
   n = length(Z)
   res = vector(length = n)
   for (i in seq(n)) {
-    nu <- sum(dnorm((X-X[i])/h)/h * (Z==Z[i]))
-    de <- sum(dnorm((X-X[i])/h)/h)
+    nu <- sum(ker_4((X[,1]-X[i,1])/h)/h * ker_4((X[,2]-X[i,2])/h)/h * (Z==Z[i]))
+    de <- sum(ker_4((X[,1]-X[i,1])/h)/h * ker_4((X[,2]-X[i,2])/h)/h)
     res[i] = nu/de
   }
   return(res)
@@ -16,8 +19,8 @@ pDhat <- function(ind,X,Z,D,h){
   n = length(Z)
   res = vector(length = n)
   for (i in seq(n)) {
-    nu <- sum(D * dnorm((X-X[i])/h)/h * (Z==ind))
-    de <- sum(dnorm((X-X[i])/h)/h * (Z==ind))
+    nu <- sum(D * ker_4((X[,1]-X[i,1])/h)/h * ker_4((X[,2]-X[i,2])/h)/h * (Z==ind))
+    de <- sum(ker_4((X[,1]-X[i,1])/h)/h * ker_4((X[,2]-X[i,2])/h)/h * (Z==ind))
     res[i] = nu/de
   }
   return(res)
@@ -27,8 +30,8 @@ pYhat <- function(ind,X,Z,Y,h){
   n = length(Z)
   res = vector(length = n)
   for (i in seq(n)) {
-    nu <- sum(Y * dnorm((X-X[i])/h)/h * (Z==ind))
-    de <- sum(dnorm((X-X[i])/h)/h * (Z==ind))
+    nu <- sum(Y * ker_4((X[,1]-X[i,1])/h)/h * ker_4((X[,2]-X[i,2])/h)/h * (Z==ind))
+    de <- sum(ker_4((X[,1]-X[i,1])/h)/h * ker_4((X[,2]-X[i,2])/h)/h * (Z==ind))
     res[i] = nu/de
   }
   return(res)
