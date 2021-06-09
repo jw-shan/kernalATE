@@ -2,7 +2,7 @@
 ### not leave one out
 ### 4-order kernel
 
-ker_4 <- function(u){(1.5-0.5*u^2)*dnorm(u)} 
+ker_4 <- function(u){(1.5-0.5*u^2)*dnorm(u)}  # 4-order kernel
 
 fhat <- function(X,Z,h){
   n = length(Z)

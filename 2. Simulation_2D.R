@@ -2,7 +2,8 @@ rm(list=ls())
 library(parallel)
 
 source("2.1 Datagen_2D.R")
-source("2.2 KernelEstimators.R")
+# source("2.2 KernelEstimators.R")
+source("2.2.1 KernelEstimators.R") # 4-order kernel
 source("2.3 plot.R")
 
 
@@ -31,7 +32,7 @@ truevalue<- 0.2866311
 
 
 # parallel setting
-cl <- makeCluster(16)
+cl <- makeCluster(50)
 clusterExport(cl,ls())
 
 
@@ -39,8 +40,9 @@ clusterExport(cl,ls())
 estimation <- function(count) {
 
   Data<-DataGen(N,seed+count)
-  h <-  N^{-1/5}
-  hopt <- 1.06*sd(Data$x)* N^{-1/6}
+  h <-  N^{-1/6}
+  # hopt <- 1.06*sd(Data$x)* N^{-1/6}
+  hopt <-  N^{-1/6}
   X<-Data$x
   Z<-Data$z
   D<-Data$d
