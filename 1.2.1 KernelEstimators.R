@@ -1,12 +1,12 @@
 # kernel estimation
-### not leave one out
+### leave one out
 
 fhat <- function(X,Z,h){
   n = length(Z)
   res = vector(length = n)
   for (i in seq(n)) {
-    nu <- sum(dnorm((X-X[i])/h)/h * (Z==Z[i]))
-    de <- sum(dnorm((X-X[i])/h)/h)
+    nu <- sum(dnorm((X[-i]-X[i])/h)/h * (Z[-i]==Z[i]))
+    de <- sum(dnorm((X[-i]-X[i])/h)/h)
     res[i] = nu/de
   }
   return(res)
@@ -16,8 +16,8 @@ pDhat <- function(ind,X,Z,D,h){
   n = length(Z)
   res = vector(length = n)
   for (i in seq(n)) {
-    nu <- sum(D * dnorm((X-X[i])/h)/h * (Z==ind))
-    de <- sum(dnorm((X-X[i])/h)/h * (Z==ind))
+    nu <- sum(D[-i] * dnorm((X[-i]-X[i])/h)/h * (Z[-i]==ind))
+    de <- sum(dnorm((X[-i]-X[i])/h)/h * (Z[-i]==ind))
     res[i] = nu/de
   }
   return(res)
@@ -27,8 +27,8 @@ pYhat <- function(ind,X,Z,Y,h){
   n = length(Z)
   res = vector(length = n)
   for (i in seq(n)) {
-    nu <- sum(Y * dnorm((X-X[i])/h)/h * (Z==ind))
-    de <- sum(dnorm((X-X[i])/h)/h * (Z==ind))
+    nu <- sum(Y[-i] * dnorm((X[-i]-X[i])/h)/h * (Z[-i]==ind))
+    de <- sum(dnorm((X[-i]-X[i])/h)/h * (Z[-i]==ind))
     res[i] = nu/de
   }
   return(res)
