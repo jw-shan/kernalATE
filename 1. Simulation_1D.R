@@ -2,18 +2,17 @@ rm(list=ls())
 library(parallel)
 
 source("1.1 Datagen_1D.R")
-source("1.2.1 KernelEstimators.R")
+source("1.2 KernelEstimators.R")
 source("1.3 plot.R")
 
 
 ## Monto Carlo times and Sample Size###
-seed = 2021
+seed = 11
 J <- 500
 N <- 500
-truevalue<- 0.087
 
 ## Monto Carlo times and Sample Size###
-seed = 300
+seed = 11
 J <- 500
 N <- 1000
 truevalue<- 0.087
@@ -31,29 +30,28 @@ truevalue<- 0.087
 
 
 # parallel setting
-cl <- makeCluster(16)
+cl <- makeCluster(40)
 clusterExport(cl,ls())
 
 
 ## Estimation function 
 estimation <- function(count) {
 
-  Data<-DataGen(N,seed+count)
-  h <- 1.06*sd(Data$x)* N^{-2/7}
+  Data<-DataGen(N,seed*count)
   hopt <- 1.06*sd(Data$x)* N^{-1/5}
+  h <- hopt * N^{1/5} * N^{-2/7}
   X<-Data$x
   Z<-Data$z
   D<-Data$d
   Y<-Data$y
   
-  KSE1_est <- KSE_1(X,Y,D,Z,h)
-  KSE2_est <- KSE_2(X,Y,D,Z,h)
-  KSE3_est <- KSE_3(X,Y,D,Z,h)
-  KSET_est <- KSE_t(X,Y,D,Z,hopt)
+  KIPW <- KSE_1(X,Y,D,Z,h)
+  KREG <- KSE_3(X,Y,D,Z,h)
+  KMR  <- KSE_t(X,Y,D,Z,hopt)
   # veff  <- estVeff(X,Y,D,Z,hopt)
   
   # est <- cbind(T1est,T2est,T3est,Test,veff)
-  est <- cbind(KSE1_est,KSE2_est,KSE3_est,KSET_est)
+  est <- cbind(KIPW,KREG,KMR)
   
   
   return(est)
@@ -66,10 +64,10 @@ est  <- t(est)
 # est  <- est[,1:4]
 
 
-result <- matrix(nrow = 4, ncol = 4)
+result <- matrix(nrow = 3, ncol = 4)
 colnames(result)<-c("bias","stdev","RMSE","CR")
-rownames(result)<-c("T1","T2","T3","T")
-for (i in 1:4) {
+rownames(result)<-c("KIPW","KREG","KMR")
+for (i in 1:3) {
   Delta <- mean(est[,i])
   bias  <- Delta - truevalue
   mse   <- 1/J*(sum((est[,i]-truevalue)^2))
@@ -99,6 +97,11 @@ result
 # plot
 est.df <- data.frame(est)
 plt_ATE(est.df)
+
+
+
+
+
 
 stopCluster(cl)
 

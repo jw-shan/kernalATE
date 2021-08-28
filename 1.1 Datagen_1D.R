@@ -73,7 +73,7 @@ DataGen = function(n,SEED){
 
 
 
-# ## true ATE
+# # ## true ATE
 # N=20000
 # delta<- c(0)
 # for(i in 1:500){
