@@ -39,8 +39,14 @@ clusterExport(cl,ls())
 estimation <- function(count) {
 
   Data<-DataGen(N,seed+count)
+<<<<<<< HEAD
   h <-  N^{-1/5}
   hopt <- 1.06*sd(Data$x)* N^{-1/6}
+=======
+  h <-  N^{-1/6}
+  # hopt <- 1.06*sd(Data$x)* N^{-1/6}
+  hopt <-  N^{-1/6} 
+>>>>>>> 5add91a3675928c751a9b69c0876c14fcd456b1f
   X<-Data$x
   Z<-Data$z
   D<-Data$d
