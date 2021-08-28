@@ -7,7 +7,7 @@ source("1.3 plot.R")
 
 
 ## Monto Carlo times and Sample Size###
-seed = 300
+seed = 2021
 J <- 500
 N <- 500
 truevalue<- 0.087
@@ -31,13 +31,13 @@ truevalue<- 0.087
 
 
 # parallel setting
-cl <- makeCluster(8)
+cl <- makeCluster(16)
 clusterExport(cl,ls())
 
 
 ## Estimation function 
 estimation <- function(count) {
-  
+
   Data<-DataGen(N,seed+count)
   h <- 1.06*sd(Data$x)* N^{-2/7}
   hopt <- 1.06*sd(Data$x)* N^{-1/5}
@@ -66,8 +66,8 @@ est  <- t(est)
 # est  <- est[,1:4]
 
 
-result <- matrix(nrow = 4, ncol = 5)
-colnames(result)<-c("bias","stdev","MSE","RMSE","CR")
+result <- matrix(nrow = 4, ncol = 4)
+colnames(result)<-c("bias","stdev","RMSE","CR")
 rownames(result)<-c("T1","T2","T3","T")
 for (i in 1:4) {
   Delta <- mean(est[,i])
@@ -84,7 +84,7 @@ for (i in 1:4) {
   coverage_rate <<- count/J
   CR <- coverage_rate
   
-  result[i,] <- cbind(bias,stdev,mse,rmse,CR)
+  result[i,] <- cbind(bias,stdev,rmse,CR)
 }
 
 result
@@ -97,7 +97,7 @@ result
 
 
 # plot
-est.df <- data.frame(est1)
+est.df <- data.frame(est)
 plt_ATE(est.df)
 
 stopCluster(cl)

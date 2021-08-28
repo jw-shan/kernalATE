@@ -1,10 +1,35 @@
 rm(list=ls())
 load("3.1 NLS.RData")
 source("3.2 KernelEstimators.R")
+library(np)
 
 
 ### Data cleaning
-X = as.data.frame(X.mat[,c(2:4, 8,9,12, 14)])
+X = X.mat[,c(2:4, 8,9,12, 14)]
+
+
+band = npregbw(Z~X)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 X$age = scale(X$age)
 X$iq  = scale(X$iq)
@@ -46,6 +71,8 @@ sum( (2*Z-1)/fhat(X,Z,h,K_x)*
 
 
 ## Estimation function 
+
+
 
 h <- N^{-1/7}
 KSET_est <- KSE_t(X,Y,D,Z,h)

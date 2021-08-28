@@ -9,19 +9,15 @@ K <- function(X,h){
   res = matrix(ncol = n, nrow = n)
   for (i in seq(n)) {
     ### continuous
-    k_age        <- dnorm((X$age - X$age[i])/h)/h
-    k_fatheduc   <- dnorm((X$fatheduc - X$fatheduc[i])/h)/h
-    k_matheduc   <- dnorm((X$motheduc - X$motheduc[i])/h)/h
-    k_iq         <- dnorm((X$iq - X$iq[i])/h)/h
+    k_age         <- dnorm((X$age - X$age[i])/h)/h
+    k_parentseduc <- dnorm((X$parentseduc - X$parentseduc[i])/h)/h
+    k_iq          <- dnorm((X$iq - X$iq[i])/h)/h
     ### binary
     k_south66      <- X$south66==X$south66[i]
     k_black        <- X$black==X$black[i]
     k_smsa66       <- X$smsa66==X$smsa66[i]
-    k_fatheduc.na  <- X$fatheduc.na==X$fatheduc.na[i]
-    k_motheduc.na  <- X$motheduc.na==X$motheduc.na[i]
-    k_iq.na        <- X$iq.na==X$iq.na[i]
-    
-    k = k_age*k_fatheduc*k_matheduc*k_iq*k_south66*k_black*k_smsa66*k_fatheduc.na*k_motheduc.na*k_iq.na
+
+    k = k_age*k_parentseduc*k_iq*k_south66*k_black*k_smsa66
     res[,i] = k
   }
   return(res)
@@ -36,6 +32,8 @@ fhat <- function(X,Z,h,K_x){
     de <- sum(K_x[,i])
     res[i] = nu/de
   }
+  res[which(res==0)]=0.0001
+  res[which(res==1)]=1-0.0001
   return(res)
 }
 
@@ -62,12 +60,16 @@ pYhat <- function(ind,X,Z,Y,h,K_x){
 }
 
 deltaDhat <- function(X,Z,D,h,K_x){
-  return(pDhat(1,X,Z,D,h,K_x)-pDhat(0,X,Z,D,h,K_x))
+  res = pDhat(1,X,Z,D,h,K_x)-pDhat(0,X,Z,D,h,K_x)
+  res[which(res==0)]=0.001
+  return(res)
 }
 
 deltaYhat <- function(X,Z,Y,h,K_x){
   return(pYhat(1,X,Z,Y,h,K_x)-pYhat(0,X,Z,Y,h,K_x))
 }
+
+
 
 # Estimators
 KSE_0 <- function(X,Y,D,Z,h){
@@ -101,14 +103,20 @@ KSE_3 <- function(X,Y,D,Z,h){
 KSE_t <- function(X,Y,D,Z,h){
   n = length(Z)
   K_x = K(X,h)
-  sum( (2*Z-1)/fhat(X,Z,h,K_x)*
-         (pDhat(0,X,Z,D,h,K_x)* deltaYhat(X,Z,Y,h,K_x) / (deltaDhat(X,Z,D,h,K_x))^2 -
-            pYhat(0,X,Z,Y,h,K_x) / deltaDhat(X,Z,D,h,K_x)) )/n+
-    sum( (2*Z-1)/fhat(X,Z,h,K_x)*
-           Y/deltaDhat(X,Z,D,h,K_x) ) /n-
-    sum( (2*Z-1)/fhat(X,Z,h,K_x)*
-           D*deltaYhat(X,Z,Y,h,K_x) / (deltaDhat(X,Z,D,h,K_x))^2 ) /n+
-    sum( deltaYhat(X,Z,Y,h,K_x)/deltaDhat(X,Z,D,h,K_x) ) /n
+  # sum( (2*Z-1)/fhat(X,Z,h,K_x)*
+  #        (pDhat(0,X,Z,D,h,K_x)* deltaYhat(X,Z,Y,h,K_x) / (deltaDhat(X,Z,D,h,K_x))^2 -
+  #           pYhat(0,X,Z,Y,h,K_x) / deltaDhat(X,Z,D,h,K_x)) )/n+
+  #   sum( (2*Z-1)/fhat(X,Z,h,K_x)*
+  #          Y/deltaDhat(X,Z,D,h,K_x) ) /n-
+  #   sum( (2*Z-1)/fhat(X,Z,h,K_x)*
+  #          D*deltaYhat(X,Z,Y,h,K_x) / (deltaDhat(X,Z,D,h,K_x))^2 ) /n+
+  #   sum( deltaYhat(X,Z,Y,h,K_x)/deltaDhat(X,Z,D,h,K_x) ) /n
+  phi_i =  (2*Z-1)/fhat(X,Z,h,K_x)*
+    (Y/deltaDhat(X,Z,D,h,K_x) - D*deltaYhat(X,Z,Y,h,K_x) / (deltaDhat(X,Z,D,h,K_x))^2 +
+       pDhat(0,X,Z,D,h,K_x)* deltaYhat(X,Z,Y,h,K_x) / (deltaDhat(X,Z,D,h,K_x))^2 -
+       pYhat(0,X,Z,Y,h,K_x) / deltaDhat(X,Z,D,h,K_x)) +
+    deltaYhat(X,Z,Y,h,K_x)/deltaDhat(X,Z,D,h,K_x) 
+  return( list(phi=phi_i,est=mean(phi_i),estVeff=sqrt(mean((phi_i-sum(phi_i)/n)^2))) )
   }
 
 estVeff <- function(X,Y,D,Z,h){
