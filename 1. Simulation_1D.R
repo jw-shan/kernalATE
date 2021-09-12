@@ -98,7 +98,7 @@ result
 est.df <- data.frame(est)
 plt_ATE(est.df)
 
-
+save(est,file="1.4.2 ResultN=1000.RData")
 
 
 
