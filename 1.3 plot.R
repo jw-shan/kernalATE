@@ -16,4 +16,6 @@ plt_ATE <- function(est){
 
 
 
+
+
 # + geom_line(data=data.frame(x=seq(-4,4,0.05),y=dnorm(seq(-4,4,0.05))),mapping = aes(x,y),color="red")

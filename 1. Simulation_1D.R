@@ -1,5 +1,6 @@
 rm(list=ls())
 library(parallel)
+library(reshape2)
 
 source("1.1 Datagen_1D.R")
 source("1.2 KernelEstimators.R")
@@ -10,6 +11,7 @@ source("1.3 plot.R")
 seed = 11
 J <- 500
 N <- 500
+truevalue<- 0.087
 
 ## Monto Carlo times and Sample Size###
 seed = 11
@@ -18,19 +20,15 @@ N <- 1000
 truevalue<- 0.087
 
 
-## Bandwidth
-# h <- N^{-1/4}
-# hopt <- N^{-1/5} #optimal bandwidth of univariate
-
-# h1 <- N^{-1/4}
-# h2 <- 0.85 * N^{-1/4}
-
-# h3 <- 2.55 * N^{-1/4}
-# ht <- 1.63 * N^{-1/5}
-
 
 # parallel setting
-cl <- makeCluster(40)
+# configure parallel environment
+ncores = detectCores()
+if (ncores<40) {
+  cl = makeCluster(ncores)
+}else{
+  cl = makeCluster(40)
+}
 clusterExport(cl,ls())
 
 
@@ -45,29 +43,30 @@ estimation <- function(count) {
   D<-Data$d
   Y<-Data$y
   
+  Naive <- mean(Y[D==1])-mean(Y[D==0])
   KIPW <- KSE_1(X,Y,D,Z,h)
   KREG <- KSE_3(X,Y,D,Z,h)
   KMR  <- KSE_t(X,Y,D,Z,hopt)
   # veff  <- estVeff(X,Y,D,Z,hopt)
   
-  # est <- cbind(T1est,T2est,T3est,Test,veff)
-  est <- cbind(KIPW,KREG,KMR)
-  
+  est <- cbind(Naive,KIPW,KREG,KMR)
   
   return(est)
 }
 
 est  <- parSapply(cl,1:J,estimation)
 est  <- t(est)
+colnames(est)<-c("Naive","KIPW","KREG","KMR")
+
 
 # veff <- est[,5]
 # est  <- est[,1:4]
 
 
-result <- matrix(nrow = 3, ncol = 4)
+result <- matrix(nrow = 4, ncol = 4)
 colnames(result)<-c("bias","stdev","RMSE","CR")
-rownames(result)<-c("KIPW","KREG","KMR")
-for (i in 1:3) {
+rownames(result)<-c("Naive","KIPW","KREG","KMR")
+for (i in 1:4) {
   Delta <- mean(est[,i])
   bias  <- Delta - truevalue
   mse   <- 1/J*(sum((est[,i]-truevalue)^2))
@@ -95,58 +94,29 @@ result
 
 
 # plot
-est.df <- data.frame(est)
+est.df <- data.frame(est[,-1])
 plt_ATE(est.df)
 
-save(est,file="1.4.2 ResultN=1000.RData")
 
-
+# save(est,file="1.4.1 ResultN=500.RData")
+# save(est,file="1.4.2 ResultN=1000.RData")
 
 
 stopCluster(cl)
 
 
-# ======naive=====================================================================
-estimation <- function(count) {
-  
-  Data<-DataGen(N,seed+count)
-  X<-Data$x
-  Z<-Data$z
-  D<-Data$d
-  Y<-Data$y
-  
-  est <- mean(Y[D==1])-mean(Y[D==0])
-  
-  # est <- cbind(Test,veff)
-  
-  return(est)
-}
 
-est  <- parSapply(cl,1:J,estimation)
-est  <- t(est)
+# -------------boxplot----------------------
+method<-c("KIPW","KREG","KMR","Naive")
+est.df <- melt(est)[,-1]
+colnames(est.df) <- c("method","estimates")
+est.df$method = factor(est.df$method,levels = method)
 
-result <- matrix(nrow = 1, ncol = 5)
-colnames(result)<-c("bias","stdev","MSE","RMSE","CR")
-rownames(result)<-"naive"
+# p_box <- ggplot(data=est.df) + geom_boxplot(mapping = aes(x=method,y=estimates),fill="gray") + theme_bw() + geom_hline(yintercept = truevalue)
+# p_box
 
-Delta <- mean(est)
-bias  <- Delta - truevalue
-mse   <- 1/J*(sum((est-truevalue)^2))
-stdev <- sqrt(1/J*(sum((est-Delta)^2)))
-rmse<- sqrt(mse)
-
-count<-0
-for(j in 1:J){
-  if(est[j]> truevalue-1.96*stdev & est[j]< truevalue+1.96*stdev)
-    count<- count+1
-}
-coverage_rate <<- count/J
-CR <- coverage_rate
-
-result <- cbind(bias,stdev,mse,rmse,CR)
-
-
-result
+boxplot(est.df$estimates~est.df$method,outline=F,xlab="",ylab="")
+abline(h=0.087)
 
 
 
