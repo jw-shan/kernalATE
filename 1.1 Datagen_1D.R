@@ -44,16 +44,15 @@ DataGen = function(n,SEED){
   p.y.true[z==1] = p0p1.y.true[2,z==1]
   p.y.true = p.y.true + 0.1*(2*u-1)
   y = rbinom(n,1,p.y.true)
+  p.d.true = p0p1.d.true[1,]
+  p.d.true[z==1] = p0p1.d.true[2,z==1]
+  p.d.true = p.d.true + 0.1*(2*u-1)
+  d = rbinom(n,1,p.d.true)
   
-  # p.d.true = p0p1.d.true[1,]
-  # p.d.true[z==1] = p0p1.d.true[2,z==1]
-  # p.d.true = p.d.true + 0.1*(2*u-1)
-  # d = rbinom(n,1,p.d.true)
-  # 
-  # p.y.true = p0p1.y.true[1,]
-  # p.y.true[z==1] = p0p1.y.true[2,z==1]
-  # p.y.true = p.y.true + 0.1*(2*u-1)
-  # y = rbinom(n,1,p.y.true)
+  p.y.true = p0p1.y.true[1,]
+  p.y.true[z==1] = p0p1.y.true[2,z==1]
+  p.y.true = p.y.true + 0.1*(2*u-1)
+  y = rbinom(n,1,p.y.true)
   
   # Delta.oracle = numeric(length(method))
   # names(Delta.oracle) = method
