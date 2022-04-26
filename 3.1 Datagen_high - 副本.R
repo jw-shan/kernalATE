@@ -1,5 +1,5 @@
-source("2.1.1 MyFunc.R")
-source("2.1.2 TrueValue.R")
+source("3.1.1 MyFunc.R")
+source("3.1.2 TrueValue.R")
 
 
 
@@ -8,12 +8,20 @@ DataGen = function(n,SEED){
   set.seed(SEED)
   
   # x: baseline covariates. 
-  x1           = rep(1,n)  #intercept term
-  x2.ind       = rbinom(n,1,0.5)
-  x2           = ((-1)^x2.ind) * runif(n,0.5,1)
-  x3           = runif(n,0,1)^2/4
+  x0 = rep(1,n)  #intercept term
+  x1 = rnorm(n,sd=0.1)
+  x2 = rnorm(n,sd=0.1)
+  x3 = abs(x1+x2) + abs(x1)*rnorm(n)
+  x4 = abs(x1+x2)^2 + abs(x2)*rnorm(n)
+  # x5 = rbinom(n,1,1/(1+exp(-x1)))
+  # x6 = rbinom(n,1,dnorm(x2))
+  x5 = rnorm(n,sd=0.1)
+  x6 = rnorm(n,sd=0.1)
 
-  x            = cbind(x1,x2,x3)
+  # bind
+  x            = cbind(x1,x2,x3,x4,x5,x6)
+  x= scale(x)
+  x = cbind(x0,x)
   u            = rbinom(n, 1, 0.5)
   
   ### True values depend on data
@@ -73,14 +81,14 @@ DataGen = function(n,SEED){
 
 
 
-# ## true ATE
-# N=10000
+# # ## true ATE
+# N=20000
 # delta<- c(0)
 # for(i in 1:500){
-#   print(i)
 #  Data<-DataGen(N,100+i)
 #  delta[i]<- mean(Data$delta.true)
 # }
 # mean(delta)
-# 
-# 0.2866311
+
+# # -0.047
+

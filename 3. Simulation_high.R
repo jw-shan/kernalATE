@@ -2,22 +2,22 @@ rm(list=ls())
 library(parallel)
 library(reshape2)
 
-source("1.1 Datagen_1D.R")
-source("1.2 KernelEstimators.R")
-source("1.3 plot.R")
+source("3.1 Datagen_high.R")
+source("3.2 KernelEstimators.R")
+source("3.3 plot.R")
 
 
 ## Monto Carlo times and Sample Size###
 seed = 11
 J <- 500
 N <- 500
-truevalue<- 0.087
+truevalue<- -0.047
 
 ## Monto Carlo times and Sample Size###
 seed = 11
 J <- 500
 N <- 1000
-truevalue<- 0.087
+truevalue<- -0.047
 
 
 
