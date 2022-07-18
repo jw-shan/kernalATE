@@ -12,8 +12,8 @@ source("1.3 plot.R")
 
 ## Monto Carlo times and Sample Size###
 seed = 11
-J <- 500
-N <- 500
+J <- 1000
+N <- 5000
 truevalue<- 0.087
 
 # ## Monto Carlo times and Sample Size###
@@ -112,21 +112,25 @@ estimation <- function(count) {
   Z<-Data$z
   D<-Data$d
   Y<-Data$y
-  hopt <- 1.06*sd(Data$x)* N^{-1/5}
-  h <- hopt * N^{1/5} * N^{-2/7}
+  # hopt <- 1.06*sd(Data$x)* N^{-1/5}
+  # h <- hopt * N^{1/5} * N^{-2/7}
   
   
   
-  KMRCV  <- KSE_CV(X,Y,D,Z)
+  est.list  <- KSE_CV(X,Y,D,Z)
   # veff  <- estVeff(X,Y,D,Z,hopt)
-
   
-  return(KMRCV)
+  IPW = est.list[["IPW"]]
+  REG = est.list[["REG"]]
+  MR  = est.list[["MR"]]
+  est <- cbind(IPW,REG,MR)
+  
+  return(est)
 }
 
 est  <- parSapply(cl,1:J,estimation)
 est  <- t(est)
-est  <- t(est)
+colnames(est)<-c("IPW","REG","MR")
 
 # colnames(est)<-c("Naive","KIPW","KREG","KMR")
 
@@ -135,10 +139,10 @@ est  <- t(est)
 # est  <- est[,1:4]
 
 
-result <- matrix(nrow = 1, ncol = 4)
+result <- matrix(nrow = 3, ncol = 4)
 colnames(result)<-c("bias","stdev","RMSE","CR")
-rownames(result)<-c("KMR-CV")
-for (i in 1:1) {
+rownames(result)<-c("IPW","REG","MR")
+for (i in 1:3) {
   Delta <- mean(est[,i])
   bias  <- Delta - truevalue
   mse   <- 1/J*(sum((est[,i]-truevalue)^2))
@@ -166,9 +170,11 @@ result
 
 
 # plot
-est.df <- data.frame(est[,-1])
+est.df <- data.frame(est)
 plt_ATE(est.df)
 
+est.norm.df <- data.frame(sqrt(N)*(est-truevalue))
+plt_ATE(est.norm.df)
 
 # save(est,file="1.4.1 ResultN=500.RData")
 # save(est,file="1.4.2 ResultN=1000.RData")

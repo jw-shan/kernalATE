@@ -48,8 +48,54 @@
   return(res)
   
   
-  
-  
-  
-  
-}
+ }
+ 
+ 
+ 
+ RF <- function(X,Y,D,Z){
+   n = length(Z)
+   
+   
+   # f(Z|X)
+   data.x.rf <- data.frame(X=X)
+   fitted.rf<-randomForest(data.x.rf,Z, maxnode=10)
+   pi.hat<-predict(fitted.rf,data.x.rf)
+   f.hat = Z*pi.hat + (1-Z)*(1-pi.hat)
+   
+   # E(D|Z,X) and E(Y|Z,X)
+   data.xz.rf <- data.frame(X=X,Z=Z)
+   data.xz.rf.1 <- data.frame(X=X,Z=1)
+   data.xz.rf.0 <- data.frame(X=X,Z=0)
+   
+   pD.hat_fit = randomForest(data.xz.rf,D,maxnode=10)
+   pD1.hat = predict(pD.hat_fit,data.xz.rf.1)
+   pD0.hat = predict(pD.hat_fit,data.xz.rf.0)
+   
+   pY.hat_fit = randomForest(data.xz.rf,Y,maxnode=10)
+   pY1.hat = predict(pY.hat_fit,data.xz.rf.1)
+   pY0.hat = predict(pY.hat_fit,data.xz.rf.0)
+   
+   
+   deltaD.hat = pD1.hat - pD0.hat
+   deltaY.hat = pY1.hat - pY0.hat
+   
+   # estimator
+   IPW = (2*Z-1)/f.hat/deltaD.hat*Y
+   IPW = mean(IPW)
+   
+   REG = deltaY.hat/deltaD.hat
+   REG = mean(REG)
+   
+   MR = (2*Z-1)/f.hat/deltaD.hat*
+     (Y- pY0.hat - (D-pD0.hat)*deltaY.hat/deltaD.hat ) +  deltaY.hat/deltaD.hat
+   MR = mean(MR)
+   
+   res = list(IPW=IPW,REG=REG,MR=MR)
+   
+   return(res)
+   
+   
+ }
+ 
+ # plot(Data$pix.true,pi.hat)
+ # abline(a=0,b=1,col="red")

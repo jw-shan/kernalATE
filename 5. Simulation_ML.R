@@ -3,8 +3,8 @@ library(parallel)
 library(reshape2)
 
 source("1.1 Datagen_1D.R")
-source("1.2 KernelEstimators.R")
-source("1.3 plot.R")
+source("5.2 RFEstimators.R")
+source("5.3 plot.R")
 
 
 ## Monto Carlo times and Sample Size###
@@ -30,6 +30,7 @@ if (ncores<40) {
   cl = makeCluster(40)
 }
 clusterExport(cl,ls())
+clusterEvalQ(cl,library(randomForest))
 
 
 ## Estimation function 
@@ -94,7 +95,7 @@ result
 
 
 # plot
-est.df <- data.frame(est[,-1])
+est.df <- est[,-1]
 plt_ATE(est.df)
 
 

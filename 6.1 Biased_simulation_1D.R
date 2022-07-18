@@ -2,16 +2,17 @@ rm(list=ls())
 library(parallel)
 library(reshape2)
 
-source("1.1 Datagen_1D.R")
-source("1.2 KernelEstimators.R")
-source("1.3 plot.R")
+source("6.1.1 Datagen.R")
+source("6.1.2 estimator.R")
+source("6.1.3 plot.R")
 
 
 ## Monto Carlo times and Sample Size###
-seed = 11
-J <- 500
-N <- 500
-truevalue<- 0.087
+seed = 220704
+J <- 2000
+N <- 1000
+# truevalue<- 0.087
+truevalue <- 0.434
 
 # ## Monto Carlo times and Sample Size###
 # seed = 11
@@ -30,43 +31,39 @@ if (ncores<40) {
   cl = makeCluster(40)
 }
 clusterExport(cl,ls())
+clusterEvalQ(cl,c(library(np),library(randomForest)))
 
 
 ## Estimation function 
 estimation <- function(count) {
 
   Data<-DataGen(N,seed*count)
-  hopt <- 1.06*sd(Data$x)* N^{-1/5} 
-  h <- hopt * N^{1/5} * N^{-2/7} 
+
   X<-Data$x
   Z<-Data$z
   D<-Data$d
   Y<-Data$y
   
-  Naive <- mean(Y[D==1])-mean(Y[D==0])
-  KIPW <- KSE_1(X,Y,D,Z,h)
-  KREG <- KSE_3(X,Y,D,Z,h)
-  KMR  <- KSE_t(X,Y,D,Z,hopt)
-  # veff  <- estVeff(X,Y,D,Z,hopt)
-  
-  est <- cbind(Naive,KIPW,KREG,KMR)
+  est = KSE_CV(X,Y,D,Z)
+  # est = RF(X,Y,D,Z)
+  est <- cbind(est[[1]],est[[2]],est[[3]])
   
   return(est)
 }
 
 est  <- parSapply(cl,1:J,estimation)
 est  <- t(est)
-colnames(est)<-c("Naive","KIPW","KREG","KMR")
+colnames(est)<-c("KIPW","KREG","KMR")
 
 
 # veff <- est[,5]
 # est  <- est[,1:4]
 
 
-result <- matrix(nrow = 4, ncol = 4)
+result <- matrix(nrow = 3, ncol = 4)
 colnames(result)<-c("bias","stdev","RMSE","CR")
-rownames(result)<-c("Naive","KIPW","KREG","KMR")
-for (i in 1:4) {
+rownames(result)<-c("KIPW","KREG","KMR")
+for (i in 1:3) {
   Delta <- mean(est[,i])
   bias  <- Delta - truevalue
   mse   <- 1/J*(sum((est[,i]-truevalue)^2))
@@ -94,7 +91,8 @@ result
 
 
 # plot
-est.df <- data.frame(est[,-1])
+# est.norm <- t(t(est - truevalue)/apply(est,2,sd))
+est.df <- data.frame(est-truevalue)
 plt_ATE(est.df)
 
 
