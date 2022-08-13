@@ -2,16 +2,19 @@ rm(list=ls())
 library(parallel)
 library(reshape2)
 
-source("6.1.1 Datagen2.R")
-source("6.1.2 estimator.R")
+source("Datagen.R")
+source("estimator_new.R")
 source("6.1.3 plot.R")
 
 
 ## Monto Carlo times and Sample Size###
-seed = 220704
-J <- 2000
-N <- 1000
-truevalue<- 0.087
+SEED = 220813
+J  <- 1000
+N  <- 1000
+p  <- 500
+p1 <- 4  #sparsity
+K  <- 2  #size of data-splitting
+truevalue<- 19.805
 # truevalue <- 0.434
 
 # ## Monto Carlo times and Sample Size###
@@ -31,27 +34,10 @@ if (ncores<40) {
   cl = makeCluster(40)
 }
 clusterExport(cl,ls())
-clusterEvalQ(cl,c(library(np),library(MASS),library(randomForest)))
+clusterEvalQ(cl,c(library(MASS),library(randomForest)))
 
 
-## Estimation function 
-estimation <- function(count) {
-
-  Data<-DataGen(N,seed*count)
-
-  X<-Data$x
-  Z<-Data$z
-  D<-Data$d
-  Y<-Data$y
-  
-  # est = KSE_CV(X,Y,D,Z)
-  est = RF(X,Y,D,Z)
-  est <- cbind(est[[1]],est[[2]],est[[3]])
-  
-  return(est)
-}
-
-est  <- parSapply(cl,1:J,estimation)
+est  <- parSapply(cl,1:J,estimate_ATE,N,p,p1,K,J,SEED)
 est  <- t(est)
 colnames(est)<-c("KIPW","KREG","KMR")
 
