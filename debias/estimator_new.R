@@ -53,7 +53,7 @@ estimate_ATE <-function(count,n,p,p1=4,K=2,J,SEED){
   p <- 500
   p1 <- 4
   
-  data1 <- Datagen(SEED,n,p,p1)
+  data1 <- Datagen(SEED+count,n,p,p1)
   
   Y  = data1$Y
   D  = data1$D
